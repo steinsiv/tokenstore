@@ -1,10 +1,10 @@
 // https://datatracker.ietf.org/doc/html/rfc7662#section-2
 export type TokenData = {
-  active: string;
+  active: "true" | "false";
   scope?: string;
-  client_id?: string;
+  "client_id"?: string;
   username?: string;
-  token_type?: string;
+  "token_type"?: string;
   exp?: number;
   iat?: number;
   nbf?: number;
@@ -16,7 +16,12 @@ export type TokenData = {
 
 export interface Store {
   checkToken(token?: string): Promise<TokenData> | TokenData;
-  storeToken(token: string, tokenData: TokenData, expiry: Date): Promise<void> | void;
+  storeToken(
+    token: string,
+    tokenData: TokenData,
+    expiry: Date,
+  ): Promise<void> | void;
   revokeToken(token: string): Promise<void> | void;
   purgeExpired(): Promise<void> | void;
+  dump(): Promise<void> | void;
 }

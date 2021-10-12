@@ -19,6 +19,11 @@ export default class MemoryStore implements Store {
     return inStore ? inStore : { active: "false" };
   }
   purgeExpired() {
-    //@todo remove all expired by timestamp   exp?: number;
+    //@todo remove all expired by timestamp (exp?: number;)
+  }
+  dump() {
+    for (const [key, value] of this.data) {
+      console.log(key, value);
+    }
   }
 }

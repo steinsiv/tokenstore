@@ -1,51 +1,45 @@
 import { Store, TokenData } from "./store.ts";
 import { SqliteDB } from "../../deps.ts";
 
-export class SqliteStorage implements Store {
+export default class SqliteStore implements Store {
   private database: SqliteDB;
 
   constructor(file: string) {
     this.database = new SqliteDB(file);
     this.database.query(
-      "CREATE TABLE IF NOT EXISTS tokens (token TEXT, expiry DATETIME)",
+      "CREATE TABLE IF NOT EXISTS tokens (token TEXT, tokenData TEXT, expiry DATE)",
     );
   }
-  checkToken(token?: string): TokenData | Promise<TokenData> {
+
+  checkToken = (token?: string): TokenData | Promise<TokenData> => {
+    this.purgeExpired();
     const res = this.database.query(
-      "SELECT count(token) FROM tokens where token == (?) AND expiry > datetime('now')",
+      "SELECT token FROM tokens where token == (?) AND expiry > datetime('now')",
       [token],
-    )[0][0] as number;
-    console.log(res);
-    return res == 1;
-  }
-  storeToken(token: string, tokenData: TokenData, expiry: Date): void | Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-  revokeToken(token: string): void | Promise<void> {
-    throw new Error("Method not implemented.");
-  }
+    )[0][0] as string;
+    return res ? JSON.parse(res) as TokenData : { active: "false" };
+  };
 
-  getToken(token: string): TokenData | Promise<TokenData | null> | null {
-    const [dbtoken] = this.database.query(
-      "SELECT tokendata FROM tokens where token == ?",
-      [token],
-    )[0][0] as [TokenData];
-    return { accessToken: dbtoken, expiry: dbexpiry };
-  }
-  persistToken(tokenData: TokenData, expiry: string): void | Promise<void> {
+  storeToken = (
+    token: string,
+    tokenData: TokenData,
+    expiry: Date,
+  ): void | Promise<void> => {
     this.database.query(
-      "INSERT INTO tokens (token,expiry) VALUES (?,datetime('now',?))",
-      [tokenData.accessToken, expiry],
+      "INSERT INTO tokens (token,tokenData, expiry) VALUES (?,?, datetime('now',?))",
+      [token, JSON.stringify(tokenData), expiry],
     );
-  }
-  deleteToken(token: string): void | Promise<void> {
-    this.database.query("DELETE FROM tokens where token == ?", [token]);
-  }
-  purgeExpired(): void | Promise<void> {
-    this.database.query("DELETE FROM tokens where expiry < datetime('now')");
-  }
+  };
 
-  public dumpTokens = () => {
+  revokeToken = (token: string): void | Promise<void> => {
+    this.database.query("DELETE FROM tokens where token == ?", [token]);
+  };
+
+  purgeExpired = (): void | Promise<void> => {
+    this.database.query("DELETE FROM tokens where expiry < datetime('now')");
+  };
+
+  public dump = () => {
     for (
       const [token, expiry] of this.database.query(
         "SELECT token,expiry FROM tokens",
