@@ -10,7 +10,7 @@ export class SqliteStorage implements Store {
       "CREATE TABLE IF NOT EXISTS tokens (token TEXT, expiry DATETIME)",
     );
   }
-  checkToken(token?: string): boolean | Promise<boolean> {
+  checkToken(token?: string): TokenData | Promise<TokenData> {
     const res = this.database.query(
       "SELECT count(token) FROM tokens where token == (?) AND expiry > datetime('now')",
       [token],
@@ -18,11 +18,18 @@ export class SqliteStorage implements Store {
     console.log(res);
     return res == 1;
   }
+  storeToken(token: string, tokenData: TokenData, expiry: Date): void | Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  revokeToken(token: string): void | Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
   getToken(token: string): TokenData | Promise<TokenData | null> | null {
-    const [dbtoken, dbexpiry] = this.database.query(
-      "SELECT token,expiry FROM tokens where token == ?",
+    const [dbtoken] = this.database.query(
+      "SELECT tokendata FROM tokens where token == ?",
       [token],
-    )[0][0] as [string, Date];
+    )[0][0] as [TokenData];
     return { accessToken: dbtoken, expiry: dbexpiry };
   }
   persistToken(tokenData: TokenData, expiry: string): void | Promise<void> {

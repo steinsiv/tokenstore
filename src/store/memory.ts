@@ -8,20 +8,17 @@ export default class MemoryStore implements Store {
   constructor() {
     this.data = new Map();
   }
-  checkToken(token: string) {
-    //@todo check datestatmp
-    return this.data.has(token);
+  storeToken(token: string, tokenData: TokenData): void | Promise<void> {
+    this.data.set(token, tokenData);
   }
-  getToken(token: string) {
-    return this.data.has(token) ? this.data.get(token)! : null;
-  }
-  persistToken(tokenData: TokenData, expiry: string) {
-    this.data.set(tokenData.accessToken, tokenData);
-  }
-  deleteToken(token: string) {
+  revokeToken(token: string): void | Promise<void> {
     this.data.delete(token);
   }
+  checkToken(token: string): TokenData | Promise<TokenData> {
+    const inStore = this.data.get(token);
+    return inStore ? inStore : { active: "false" };
+  }
   purgeExpired() {
-    //
+    //@todo remove all expired by timestamp   exp?: number;
   }
 }
