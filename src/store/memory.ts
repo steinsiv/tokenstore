@@ -15,13 +15,26 @@ export default class MemoryStore implements Store {
     this.data.delete(token);
   }
   checkToken(token: string): TokenData | Promise<TokenData> {
-    const inStore = this.data.get(token);
-    return inStore ? inStore : { active: "false" };
+    let inStore: TokenData = this.data.get(token) || { active: "false" };
+    if (inStore.exp) {
+      const exp = new Date(inStore.exp as number);
+      if (exp < new Date()) {
+        inStore = { active: "false" };
+      }
+    } else {
+      this.purgeExpired();
+    }
+    return inStore;
   }
   purgeExpired() {
-    //@todo remove all expired by timestamp (exp?: number;)
+    for (const [key, value] of this.data) {
+      if (value.exp && new Date(value.exp as number) < new Date()) {
+        this.revokeToken(key);
+      }
+    }
   }
   dump() {
+    console.log(`Num tokens in memory: ${this.data.size}`);
     for (const [key, value] of this.data) {
       console.log(key, value);
     }

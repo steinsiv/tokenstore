@@ -1,19 +1,32 @@
 import { MemoryStore, TokenStore } from "../mod.ts";
 
-const memstore = new MemoryStore();
-const tstore = new TokenStore(memstore);
+const tstore = new TokenStore(new MemoryStore());
 
-const addMinutes = (date: Date, minutes: number) => {
-  return new Date(date.getTime() + minutes * 60000);
+const addTime = (date: Date, seconds: number) => {
+  return new Date(date.getTime() + seconds * 1000);
 };
 
-const expiry = addMinutes(new Date(), 10);
+const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
-console.log(new Date());
-console.log(new Date().getTime());
-console.log(expiry);
-console.log(expiry.getTime());
+// Push
+let expiry = addTime(new Date(), 10);
+await tstore.insert("TEST 10sec", { active: "true", jti: "TEST 10sec", exp: expiry.getTime() }, expiry);
 
-await tstore.insert("TEST", { active: "true", jti: "TEST", exp: expiry.getTime() }, expiry);
+expiry = addTime(new Date(), 20);
+await tstore.insert("TEST 20sec", { active: "true", jti: "TEST 20sec", exp: expiry.getTime() }, expiry);
 
-console.log(await tstore.dump());
+// Poll
+console.log(await tstore.check("TEST 10sec"));
+console.log(await tstore.check("TEST 20sec"));
+
+await sleep(10001);
+
+console.log(await tstore.check("TEST 10sec"));
+console.log(await tstore.check("TEST 20sec"));
+
+await tstore.revoke("TEST 20sec");
+
+console.log(await tstore.check("TEST 10sec"));
+console.log(await tstore.check("TEST 20sec"));

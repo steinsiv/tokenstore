@@ -8,8 +8,9 @@ export class TokenStore {
   }
 
   public check = async (token: string) => {
-    await this.store.revokeToken(token);
+    return this.store.checkToken(token);
   };
+
   public revoke = async (token: string) => {
     await this.store.revokeToken(token);
   };
