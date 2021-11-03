@@ -1,6 +1,6 @@
 # tokenstore
 
-tokenstorage... thats all
+tokenstorage... that's all
 
 - Redis
 - Memory
