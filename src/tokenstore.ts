@@ -8,14 +8,14 @@ export class TokenStore {
   }
 
   public check = async (token: string) => {
-    return this.store.checkToken(token);
+    return await this.store.checkToken(token);
   };
 
   public revoke = async (token: string) => {
     await this.store.revokeToken(token);
   };
-  public insert = async (token: string, tokenData: TokenData, expiry: Date) => {
-    await this.store.storeToken(token, tokenData, expiry);
+  public insert = async (token: string, tokenData: TokenData) => {
+    await this.store.storeToken(token, tokenData);
   };
   public dump = () => {
     this.store.dump();

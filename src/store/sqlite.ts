@@ -7,27 +7,26 @@ export default class SqliteStore implements Store {
   constructor(file: string) {
     this.database = new SqliteDB(file);
     this.database.query(
-      "CREATE TABLE IF NOT EXISTS tokens (token TEXT, tokenData TEXT, expiry DATE)",
+      "CREATE TABLE IF NOT EXISTS tokens (token TEXT, tokenData TEXT, expiry DATETIME)",
     );
   }
 
   checkToken = (token?: string): TokenData | Promise<TokenData> => {
     this.purgeExpired();
     const res = this.database.query(
-      "SELECT token FROM tokens where token == (?) AND expiry > datetime('now')",
+      "SELECT tokenData FROM tokens where token == (?) AND expiry > datetime('now')",
       [token],
-    )[0][0] as string;
-    return res ? JSON.parse(res) as TokenData : { active: "false" };
+    )[0];
+    return res ? JSON.parse(res[0] as string) as TokenData : { active: "false", exp: 0 };
   };
 
   storeToken = (
     token: string,
     tokenData: TokenData,
-    expiry: Date,
   ): void | Promise<void> => {
     this.database.query(
-      "INSERT INTO tokens (token,tokenData, expiry) VALUES (?,?, datetime('now',?))",
-      [token, JSON.stringify(tokenData), expiry],
+      "INSERT INTO tokens (token,tokenData, expiry) VALUES (?,?,datetime(?,'unixepoch'))",
+      [token, JSON.stringify(tokenData), tokenData.exp / 1000],
     );
   };
 

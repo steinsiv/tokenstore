@@ -7,7 +7,10 @@ const addTime = (date: Date, seconds: number) => {
 };
 
 const sleep = (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  console.log("sleeping 10sec...");
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 };
 
 // Push
@@ -21,7 +24,7 @@ await tstore.insert("TEST 20sec", { active: "true", jti: "TEST 20sec", exp: expi
 console.log(await tstore.check("TEST 10sec"));
 console.log(await tstore.check("TEST 20sec"));
 
-await sleep(10001);
+sleep(10001);
 
 console.log(await tstore.check("TEST 10sec"));
 console.log(await tstore.check("TEST 20sec"));

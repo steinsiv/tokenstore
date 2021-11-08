@@ -28,13 +28,13 @@ export default class RedisStore implements Store {
   storeToken = async (
     token: string,
     tokenData: TokenData,
-    expiry: Date,
   ): Promise<void> => {
     this.connect();
     await this.database?.set(
       `${this.prefix}${token}`,
       JSON.stringify(tokenData),
     );
+    const expiry = new Date(tokenData.exp as number);
     const timestamp = String(expiry.getTime() / 1000);
     await this.database?.expireat(`${this.prefix}${token}`, timestamp);
   };
