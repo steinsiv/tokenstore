@@ -22,7 +22,7 @@ export default class RedisStore implements Store {
   checkToken = async (token?: string): Promise<TokenData> => {
     this.connect();
     const dbtoken = await this.database?.get(`${this.prefix}${token}`);
-    return dbtoken ? JSON.parse(dbtoken) : { active: "false" };
+    return dbtoken ? JSON.parse(dbtoken) : { active: false };
   };
 
   storeToken = async (
