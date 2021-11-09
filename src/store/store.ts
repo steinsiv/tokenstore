@@ -1,6 +1,6 @@
 // https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
 export type TokenData = {
-  active: "true" | "false";
+  active: boolean;
   scope?: string; // https://datatracker.ietf.org/doc/html/rfc6749#section-3.3
   "client_id"?: string;
   username?: string;

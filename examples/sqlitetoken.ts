@@ -13,13 +13,15 @@ const sleep = (ms: number) => {
 // Push
 await tstore.insert("TEST10", { active: "true", jti: "TEST 10sec", exp: timeOffset(10).getTime() });
 await tstore.insert("TEST20", { active: "true", jti: "TEST 20sec", exp: timeOffset(20).getTime() });
+await tstore.insert("TEST20", { active: "true", jti: "TEST 20sec", exp: timeOffset(20).getTime() });
 
 console.log("\nDump tokens...");
-console.log(await tstore.check("TEST 10sec"));
-console.log(await tstore.check("TEST 20sec"));
+console.log(await tstore.check("TEST10"));
+console.log(await tstore.check("TEST20"));
+await sleep(10001);
+
 console.log(tstore.dump());
 
-await sleep(10001);
 console.log("\n\n10sec passed...");
 console.log("Check tokens...");
 console.log(await tstore.check("TEST 10sec"));

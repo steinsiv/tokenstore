@@ -17,7 +17,7 @@ export default class SqliteStore implements Store {
       "SELECT tokenData FROM tokens where token == (?) AND expiry > datetime('now')",
       [token],
     )[0];
-    return res ? JSON.parse(res[0] as string) as TokenData : { active: "false", exp: 0 };
+    return res ? JSON.parse(res[0] as string) as TokenData : { active: false, exp: 0 };
   };
 
   storeToken = (
