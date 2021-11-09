@@ -15,11 +15,11 @@ export default class MemoryStore implements Store {
     this.data.delete(token);
   }
   checkToken(token: string): TokenData | Promise<TokenData> {
-    let inStore: TokenData = this.data.get(token) || { active: "false" };
+    let inStore: TokenData = this.data.get(token) || { active: "false", exp: 0 };
     if (inStore.exp) {
       const exp = new Date(inStore.exp as number);
       if (exp < new Date()) {
-        inStore = { active: "false" };
+        inStore = { active: "false", exp: exp.getTime() };
       }
     } else {
       this.purgeExpired();

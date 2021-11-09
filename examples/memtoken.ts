@@ -15,10 +15,10 @@ const sleep = (ms: number) => {
 
 // Push
 let expiry = addTime(new Date(), 10);
-await tstore.insert("TEST 10sec", { active: "true", jti: "TEST 10sec", exp: expiry.getTime() }, expiry);
+await tstore.insert("TEST 10sec", { active: "true", jti: "TEST 10sec", exp: expiry.getTime() });
 
 expiry = addTime(new Date(), 20);
-await tstore.insert("TEST 20sec", { active: "true", jti: "TEST 20sec", exp: expiry.getTime() }, expiry);
+await tstore.insert("TEST 20sec", { active: "true", jti: "TEST 20sec", exp: expiry.getTime() });
 
 // Poll
 console.log(await tstore.check("TEST 10sec"));

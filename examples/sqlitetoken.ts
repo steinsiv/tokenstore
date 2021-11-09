@@ -2,8 +2,8 @@ import { SqliteStore, TokenStore } from "../mod.ts";
 const db = "tokens.sqlite";
 const tstore = new TokenStore(new SqliteStore(db));
 
-const addTime = (date: Date, seconds: number) => {
-  return new Date(date.getTime() + seconds * 1000);
+const timeOffset = (seconds: number) => {
+  return new Date(new Date().getTime() + seconds * 1000);
 };
 
 const sleep = (ms: number) => {
@@ -11,13 +11,10 @@ const sleep = (ms: number) => {
 };
 
 // Push
-let expiry = addTime(new Date(), 10);
-await tstore.insert("TEST 10sec", { active: "true", jti: "TEST 10sec", exp: expiry.getTime() });
+await tstore.insert("TEST10", { active: "true", jti: "TEST 10sec", exp: timeOffset(10).getTime() });
+await tstore.insert("TEST20", { active: "true", jti: "TEST 20sec", exp: timeOffset(20).getTime() });
 
-expiry = addTime(new Date(), 20);
-await tstore.insert("TEST 20sec", { active: "true", jti: "TEST 20sec", exp: expiry.getTime() });
-
-console.log("Check tokens...");
+console.log("\nDump tokens...");
 console.log(await tstore.check("TEST 10sec"));
 console.log(await tstore.check("TEST 20sec"));
 console.log(tstore.dump());
